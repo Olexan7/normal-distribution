@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Розыгрыш нормальной величины</title>
+    <style>
+      canvas {
+        display: block;
+        margin-top: 20px;
+      }
+      table {
+        border-collapse: collapse;
+        border: 1px solid black;
+      }
+      th,
+      td {
+        border: 1px solid black;
+        padding: 1px;
+        text-align: center;
+      }
+      input[type="button"] {
+        padding: 5px;
+        font-size: 15px;
+        border-radius: 4px;
+      }
+      .count-input,
+      .sourse-vertex {
+        width: 50px;
+        padding: 4px;
+        font-size: 15px;
+        background-color: honeydew;
+        border: unset;
+        border-radius: 4px;
+        outline: auto;
+      }
+      label {
+        font-size: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Розыгрыш нормальной величины с параметрами m=4;σ=1</h2>
+    <label class="count-lable" for="count"
+      >Введите количество разыгранных значений:
+    </label>
+    <input class="count-input" id="count" type="text" value="200" />
+    <input class="count-button" type="button" value="Выполнить розыгрыш" />
+    <h3>Таблица разыгранных значений:</h3>
+    <table id="value-table"></table>
+    <h3>Таблица интервального вариационного ряда:</h3>
+    <table id="variation-table">
+      <thead>
+        <tr>
+          <th>Интервал</th>
+          <th>Частота</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <h3>Гистограмма относительных частот:</h3>
+    <canvas id="histogram"></canvas>
+    <h3>График функции плотности распределения:</h3>
+    <canvas id="density-plot"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
