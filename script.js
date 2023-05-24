@@ -1,4 +1,49 @@
+// Функция для нахождения доверительного интервала для Mξ с известной дисперсией
+function confidenceIntervalKnownVariance(data, alpha) {
+  const n = data.length;
+  const mean = data.reduce((sum, x) => sum + x, 0) / n;
+  const squaredDifferences = data.map((x) => Math.pow(x - mean, 2));
+  const variance = squaredDifferences.reduce((sum, x) => sum + x, 0) / n;
+  const z = jStat.normal.inv(1 - (1 - alpha) / 2, 0, 1); // Используем библиотеку jStat для вычисления z-значения
+
+  const lowerBound = mean - z * Math.sqrt(variance / n);
+  const upperBound = mean + z * Math.sqrt(variance / n);
+
+  return [lowerBound.toFixed(2), upperBound.toFixed(2)];
+}
+
+// Функция для нахождения доверительного интервала для Mξ с неизвестной дисперсией
+function confidenceIntervalUnknownVariance(data, alpha) {
+  const n = data.length;
+  const mean = data.reduce((sum, x) => sum + x, 0) / n;
+  const t = jStat.studentt.inv(1 - (1 - alpha) / 2, n - 1); // Используем библиотеку jStat для вычисления t-значения
+  const s = Math.sqrt(
+    data.reduce((sum, x) => sum + Math.pow(x - mean, 2), 0) / (n - 1)
+  ); // Несмещенная оценка дисперсии
+
+  const lowerBound = mean - t * (s / Math.sqrt(n));
+  const upperBound = mean + t * (s / Math.sqrt(n));
+
+  return [lowerBound.toFixed(2), upperBound.toFixed(2)];
+}
+
+// Функция для нахождения доверительного интервала для Dξ
+function confidenceIntervalVariance(data, alpha) {
+  const n = data.length;
+  const chi2Lower = jStat.chisquare.inv((1 - alpha) / 2, n - 1); // Используем библиотеку jStat для вычисления нижней границы chi-квадрат распределения
+  const chi2Upper = jStat.chisquare.inv((1 + alpha) / 2, n - 1); // Используем библиотеку jStat для вычисления верхней границы chi-квадрат распределения
+  const mean = data.reduce((sum, x) => sum + x, 0) / n;
+  const squaredDifferences = data.map((x) => Math.pow(x - mean, 2));
+  const variance = squaredDifferences.reduce((sum, x) => sum + x, 0) / n;
+  const lowerBound = ((n - 1) * variance) / chi2Upper;
+  const upperBound = ((n - 1) * variance) / chi2Lower;
+
+  return [lowerBound.toFixed(2), upperBound.toFixed(2)];
+}
+
 function main() {
+  document.querySelector(".text-compare").innerHTML = "";
+  document.querySelector(".interval-case").innerHTML = "";
   document.querySelector("#value-table").innerHTML = "";
   document.querySelector("#variation-table").innerHTML =
     "<thead><tr><th>Интервал</th><th>Частота</th></tr></thead><tbody></tbody>";
@@ -172,6 +217,60 @@ function main() {
     options: {},
   };
   let densityPlotChart = new Chart(densityPlotCtx, densityPlotConfig);
+
+  let compareArray = [];
+  compareArray = generatedData.slice(0, parseInt(generatedData.length * 0.1));
+  const n = compareArray.length;
+  let temp = `<p>Выборка на основе ${n} первых значений</p>`;
+
+  // Вычисление выборочного среднего
+  const xBar = compareArray.reduce((sum, value) => sum + value, 0) / n;
+  temp += `<p>Вычисление выборочного среднего x&#x0304: ${xBar.toFixed(2)}</p>`;
+
+  // Вычисление выборочной дисперсии
+  const sampleVariance =
+    compareArray.reduce((sum, value) => sum + Math.pow(value - xBar, 2), 0) / n;
+  temp += `<p>Вычисление выборочной дисперсии D<sub>в</sub>: ${sampleVariance.toFixed(
+    2
+  )}</p>`;
+
+  // Вычисление исправленной выборочной дисперсии
+  const correctedSampleVariance =
+    compareArray.reduce((sum, value) => sum + Math.pow(value - xBar, 2), 0) /
+    (n - 1);
+  temp += `<p>Вычисление исправленной выборочной дисперсии S<sup>2</sup>: ${correctedSampleVariance.toFixed(
+    2
+  )}</p>`;
+
+  // Вычисление выборочного стандартного отклонения
+  const sampleStandardDeviation = Math.sqrt(sampleVariance);
+  temp += `<p>Вычисление выборочного стандартного отклонения σ<sub>в</sub>: ${sampleStandardDeviation.toFixed(
+    2
+  )}</p>`;
+
+  // Вычисление исправленного выборочного стандартного отклонения
+  const correctedSampleStandardDeviation = Math.sqrt(correctedSampleVariance);
+  temp += `<p>Вычисление исправленного выборочного стандартного отклонения S: ${correctedSampleStandardDeviation.toFixed(
+    2
+  )}</p>`;
+  document.querySelector(".text-compare").innerHTML = temp;
+
+  /////////////
+  let templation = "";
+  // Пример использования
+  const data = generatedData; // Замените данными из вашей выборки
+  const alpha = 0.95;
+
+  const intervalKnownVariance = confidenceIntervalKnownVariance(data, alpha);
+  templation += `<p>Доверительный интервал для Mξ - μ с известной дисперсией: [${intervalKnownVariance}]</p>`;
+  const intervalUnknownVariance = confidenceIntervalUnknownVariance(
+    data,
+    alpha
+  );
+  templation += `<p>Доверительный интервал для Mξ - μ с неизвестной дисперсией: [${intervalUnknownVariance}]</p>`;
+  const intervalVariance = confidenceIntervalVariance(data, alpha);
+  templation += `<p>Доверительный интервал для Dξ - σ: [${intervalVariance}]</p>`;
+  document.querySelector(".interval-case").innerHTML = templation;
 }
 
 main();

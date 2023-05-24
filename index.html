@@ -38,7 +38,7 @@
     </style>
   </head>
   <body>
-    <h2>Розыгрыш нормальной величины с параметрами m=4;σ=1</h2>
+    <h2>Розыгрыш нормальной величины с параметрами μ=4;σ=1</h2>
     <label class="count-lable" for="count"
       >Введите количество разыгранных значений:
     </label>
@@ -60,7 +60,18 @@
     <canvas id="histogram"></canvas>
     <h3>График функции плотности распределения:</h3>
     <canvas id="density-plot"></canvas>
+    <div>
+      <h2>Оценки параметров распределений по выборкам</h2>
+      <h3>Вычисление значений:</h3>
+      <div class="text-compare"></div>
+      <table class="table-select-compare"></table>
+    </div>
+    <div>
+      <h2>Нахождение доверительных интервалов с надежностью α = 0.95</h2>
+      <div class="interval-case"></div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstat/1.9.3/jstat.min.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
